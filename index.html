@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Page</title>
+		<meta charset="UTF-8">
+		<meta name=description content="">
+		<meta name=viewport content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap CSS -->
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	</head>
+	<body>
+
+	<div class="container">
+		<div class="row">&nbsp</div>
+		<div class="row">
+			<form class="form-inline">
+				<div class="form-group">
+					<label class="sr-only" for="inputSearch">Zip code</label>
+					<div class="input-group">
+						<input type="text" class="form-control" id="inputSearch" placeholder="Zip code">
+					</div>
+				</div>
+				<!--<button type="submit" class="btn btn-primary" id="search">Search</button>-->
+			</form>
+		</div>
+
+		<div class="row">
+			latitude: <p id="latitude"></p>
+			longitude: <p id="longitude"></p>
+		</div>
+	</div>
+
+		<!-- jQuery -->
+		<script src="//code.jquery.com/jquery.js"></script>
+		<!-- Bootstrap JavaScript -->
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <!-- Papa Parse -->
+    <script src="scripts/papaparse.min.js"></script>
+    <script>
+			var obj = {};
+			readTextFile('./assets/out');
+
+			function readTextFile(file)
+			{
+				var rawFile = new XMLHttpRequest();
+				rawFile.open("GET", file, false);
+				rawFile.onreadystatechange = function ()
+				{
+					if(rawFile.readyState === 4)
+					{
+						if(rawFile.status === 200 || rawFile.status == 0)
+						{
+							var allText = rawFile.responseText;
+
+							Papa.parse(allText, {
+								delimiter: "",	// auto-detect
+								newline: "",	// auto-detect
+								header: false,
+								dynamicTyping: false,
+								preview: 0,
+								encoding: "urf-8",
+								worker: false,
+								comments: false,
+								step: undefined,
+								complete: function(result) {
+									return obj = result;
+								},
+								error: undefined,
+								download: false,
+								skipEmptyLines: false,
+								chunk: undefined,
+								fastMode: false
+							});
+						}
+					}
+				};
+				rawFile.send(null);
+			}
+
+			if(obj.errors['length'] === 0)
+			{
+				var data = [];
+
+				var i = 1;
+				for(; i < obj.data.length; i++)
+				{
+					if(obj.data[i][4] == 'United States')
+					{
+						data.push({
+							'country': obj.data[i][4],
+							'zip': obj.data[i][0],
+							'latitude': obj.data[i][6],
+							'longitude': obj.data[i][7]
+						});
+					}
+				}
+//				console.log(data.length, data);
+			}
+
+			$('#inputSearch').blur(function()
+			{
+				if( !$(this).val() ) {
+					alert('Input zip code');
+				}
+				var resultObject = search($(this).val(), data);
+
+				$("#latitude").append(resultObject.latitude);
+				$("#longitude").append(resultObject.longitude);
+//				console.log(resultObject.latitude, resultObject.longitude);
+			});
+
+			function search(nameKey, myArray){
+				for (var i=0; i < myArray.length; i++) {
+					if (myArray[i].zip === nameKey) {
+						return myArray[i];
+					}
+				}
+			}
+
+
+    </script>
+	</body>
+</html>
