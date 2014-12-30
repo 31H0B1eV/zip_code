@@ -105,8 +105,8 @@
 				}
 				var resultObject = search($(this).val(), data);
 
-				$("#latitude").append(resultObject.latitude);
-				$("#longitude").append(resultObject.longitude);
+				$("#latitude").empty().append(resultObject.latitude);
+				$("#longitude").empty().append(resultObject.longitude);
 //				console.log(resultObject.latitude, resultObject.longitude);
 			});
 
